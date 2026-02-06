@@ -1,13 +1,5 @@
 [
   {
-    "name": "Reuters – Commodities",
-    "url": "https://www.reuters.com/markets/commodities/"
-  },
-  {
-    "name": "World Steel Association",
-    "url": "https://www.worldsteel.org/media-centre/press-releases/"
-  },
-  {
     "name": "GMK Center",
     "url": "https://gmk.center/en/"
   },
@@ -23,10 +15,7 @@
     "name": "Kallanish",
     "url": "https://www.kallanish.com/en/news/steel/free-content/"
   },
-  {
-    "name": "EuroNews",
-    "url": "https://www.euronews.com/tag/steel-industry"
-  },
+
   {
     "name": "MEPS",
     "url": "https://mepsinternational.com/gb/en"
