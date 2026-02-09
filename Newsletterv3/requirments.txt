@@ -1,0 +1,5 @@
+pdfplumber
+jinja2
+openai
+requests
+beautifulsoup4
