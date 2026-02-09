@@ -39,8 +39,32 @@ KEYWORDS = [
 BLOCKED_URL_PATTERNS = [
     "/tag/", "/topics/", "/programme", "/shows", "/contact", "/about",
     "/terms", "/privacy", "/cookies", "/policy", "/legal", "/events",
-    "x.com", "twitter.com", "youtube.com"
+    "x.com", "twitter.com", "youtube.com" , "cookie"
+    "cookie",
+    "cookies",
+    "privacy",
+    "polityka prywatności",
+    "terms of use",
+    "warunki korzystania",
+    "dane osobowe",
+    "consent",
+    "zgodnie z przepisami ue",
+    "rodo"
 ]
+
+BLOCKED_CONTENT_PATTERNS = [
+    "cookie",
+    "cookies",
+    "privacy",
+    "polityka prywatności",
+    "terms of use",
+    "warunki korzystania",
+    "dane osobowe",
+    "consent",
+    "zgodnie z przepisami ue",
+    "rodo"
+]
+
 
 SOURCE_ICONS = {
     "euronews.com": "🟦",
@@ -48,7 +72,13 @@ SOURCE_ICONS = {
     "steelonthenet.com": "⚙️",
     "gmk.center": "📊",
     "steelorbis.com": "🌍",
+
 }
+ABBREVIATIONS = {
+    "r.", "tys.", "mln.", "mld.", "nr.", "itd.", "m.in.", "ok.", "proc."
+}
+
+
 
 DEBUG = True
 
@@ -83,7 +113,7 @@ TEKST:
                 "model": MODEL_NAME,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.2,
-                "max_tokens": 120,
+                "max_tokens": 180,
                 "top_p": 0.9
             }
             r = requests.post(
@@ -123,7 +153,18 @@ def is_valid_summary(s: str) -> bool:
     )
 
 def limit_to_one_sentence(text: str) -> str:
-    return re.split(r'(?<=[.!?])\s+', text.strip())[0]
+    protected = text
+
+    # zabezpiecz skróty
+    for abbr in ABBREVIATIONS:
+        protected = protected.replace(abbr, abbr.replace(".", "<DOT>"))
+
+    parts = re.split(r'(?<=[.!?])\s+', protected.strip())
+    first = parts[0]
+
+    # przywróć kropki
+    return first.replace("<DOT>", ".")
+
 
 # =====================
 # PDF / EXCEL
@@ -201,7 +242,6 @@ def pobierz_linki_artykulow(url):
         if any(k in full.lower() for k in KEYWORDS) or looks_like_article_url(full):
             links.add(full)
     return list(links)[:25]
-
 def pobierz_tekst_i_date(url):
     downloaded = trafilatura.fetch_url(url)
     if not downloaded:
@@ -227,7 +267,12 @@ def pobierz_tekst_i_date(url):
     if not text or len(text) < 600:
         return None, None
 
+    lower = text.lower()
+    if any(p in lower for p in BLOCKED_CONTENT_PATTERNS):
+        return None, None
+
     return text, metadata.date
+
 
 def get_source_icon(url):
     domain = urlparse(url).netloc.lower()
